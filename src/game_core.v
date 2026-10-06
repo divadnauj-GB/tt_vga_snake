@@ -1,13 +1,12 @@
 module game_core(
 input   wire clk,
 input   wire rst_n,
-input   wire [4:0] cell_x,
-input   wire [3:0] cell_y,
+input   wire [4:0] cell_x,
+input   wire [3:0] cell_y,
 input   wire video_active,
 input   wire game_tick,
 input   wire [1:0] user_dir,
 output  reg [1:0] R,G,B
-
 );
 
 
@@ -64,7 +63,7 @@ integer i;
       for (i=2; i<SNAKE_LENGHT; i=i+1) begin
         snake_body[i] <= 0;
       end
-      snake_body[0] <= 9'h304;
+      snake_body[0] <= 9'h104;
       snake_body[1] <= 9'h103;
     end else begin
       if (update_body) begin
