@@ -13,7 +13,7 @@ module game_core (
 
 
 
-  localparam SNAKE_LENGHT = 25;
+  localparam SNAKE_LENGHT = 12;
   localparam ABS_UP = 2'b00;
   localparam ABS_DOWN = 2'b01;
   localparam ABS_LEFT = 2'b10;
@@ -82,7 +82,7 @@ and pushing a new head coordinates*/
     if (~rst_n) begin
       tail_ptr <= 1;
     end else begin
-      if (grow_snake && tail_ptr<(SNAKE_LENGHT-1)) begin
+      if (grow_snake && tail_ptr < (SNAKE_LENGHT - 1)) begin
         tail_ptr <= tail_ptr + 1;
       end
     end
@@ -111,8 +111,8 @@ and pushing a new head coordinates*/
                           // Drop the computed relative crumb BEFORE changing the head's absolute direction
                           head_dir <= user_dir;
                       end*/
-            head_dir    <= user_dir;
-            state       <= STATE_MOVE_SNAKE;
+            head_dir <= user_dir;
+            state    <= STATE_MOVE_SNAKE;
           end
           read_ptr    <= 0;
           gen_food    <= 0;
@@ -126,15 +126,15 @@ and pushing a new head coordinates*/
                         (head_dir == ABS_DOWN  && next_head_y == 4'd15) ||
                         (head_dir == ABS_LEFT  && next_head_x == 5'd31)  ||
                         (head_dir == ABS_RIGHT && next_head_x == 5'd20)) begin
-            game_over   <= 1'b1;
-            state       <= STATE_IDLE;
+            game_over <= 1'b1;
+            state     <= STATE_IDLE;
           end  // 2. Self-Collision Check via single-cycle lookups
           else if (snake_body[read_ptr] == {next_head_y, next_head_x}) begin
-            game_over   <= 1'b1;
-            state       <= STATE_IDLE;
+            game_over <= 1'b1;
+            state     <= STATE_IDLE;
           end else if (read_ptr < tail_ptr) begin
-            read_ptr    <= read_ptr + 5'd1;
-            state       <= STATE_MOVE_SNAKE;
+            read_ptr <= read_ptr + 5'd1;
+            state    <= STATE_MOVE_SNAKE;
           end else begin
             state <= STATE_GROW_SNAKE;
             update_body <= 1'b1;
