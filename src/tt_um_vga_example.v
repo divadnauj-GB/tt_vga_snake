@@ -35,7 +35,7 @@ module tt_um_vga_example(
     reg signed [$clog2(DEBOUNCE_TIME):0] debounce_counter;
     reg [1:0] user_dir;
     reg game_tick;
-    reg [4:0] frame_count;
+    reg [3:0] frame_count;
     wire frame_tick = (pix_x == 10'd0) && (pix_y == 10'd480);
     wire clean_key3;
     wire clean_key2;
