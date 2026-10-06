@@ -13,7 +13,7 @@ module game_core (
 
 
 
-  localparam SNAKE_LENGHT = 32;
+  localparam SNAKE_LENGHT = 30;
   localparam ABS_UP = 2'b00;
   localparam ABS_DOWN = 2'b01;
   localparam ABS_LEFT = 2'b10;
@@ -82,7 +82,7 @@ and pushing a new head coordinates*/
     if (~rst_n) begin
       tail_ptr <= 1;
     end else begin
-      if (grow_snake) begin
+      if (grow_snake && tail_ptr<(SNAKE_LENGHT-1)) begin
         tail_ptr <= tail_ptr + 1;
       end
     end
