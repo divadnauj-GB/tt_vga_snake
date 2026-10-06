@@ -21,8 +21,8 @@ module game_core (
   // FSM State Encodings
 
   localparam STATE_IDLE = 2'b00;
-  localparam STATE_MOVE_HEAD = 2'b01;
-  localparam STATE_MOVE_TAIL = 2'b10;
+  localparam STATE_MOVE_SNAKE = 2'b01;
+  localparam STATE_GROW_SNAKE = 2'b10;
 
   reg [8:0] snake_body[0:SNAKE_LENGHT-1];
   reg [$clog2(SNAKE_LENGHT)-1:0] tail_ptr;
@@ -62,11 +62,10 @@ and pushing a new head coordinates*/
   integer i;
   always @(posedge clk, negedge rst_n) begin
     if (~rst_n) begin
-      for (i = 2; i < SNAKE_LENGHT; i = i + 1) begin
+      for (i = 1; i < SNAKE_LENGHT; i = i + 1) begin
         snake_body[i] <= 0;
       end
       snake_body[0] <= 9'h104;
-      snake_body[1] <= 9'h103;
     end else begin
       if (update_body) begin
         for (i = SNAKE_LENGHT - 1; i > 0; i = i - 1) begin
@@ -81,7 +80,7 @@ and pushing a new head coordinates*/
   /*snake lenght updating during the game*/
   always @(posedge clk, negedge rst_n) begin
     if (~rst_n) begin
-      tail_ptr <= 2;
+      tail_ptr <= 1;
     end else begin
       if (grow_snake) begin
         tail_ptr <= tail_ptr + 1;
@@ -113,12 +112,7 @@ and pushing a new head coordinates*/
                           head_dir <= user_dir;
                       end*/
             head_dir    <= user_dir;
-            state       <= STATE_MOVE_HEAD;
-            read_ptr    <= 0;
-            game_over   <= 1'b0;
-            gen_food    <= 0;
-            grow_snake  <= 0;
-            update_body <= 0;
+            state       <= STATE_MOVE_SNAKE;
           end
           read_ptr    <= 0;
           gen_food    <= 0;
@@ -126,53 +120,36 @@ and pushing a new head coordinates*/
           update_body <= 0;
         end
 
-        STATE_MOVE_HEAD: begin
+        STATE_MOVE_SNAKE: begin
           // 1. Boundary Wall Collision Check
           if ((head_dir == ABS_UP    && next_head_y == 4'd15)  ||
                         (head_dir == ABS_DOWN  && next_head_y == 4'd15) ||
                         (head_dir == ABS_LEFT  && next_head_x == 5'd31)  ||
                         (head_dir == ABS_RIGHT && next_head_x == 5'd20)) begin
             game_over   <= 1'b1;
-            gen_food    <= 0;
-            grow_snake  <= 0;
-            update_body <= 0;
             state       <= STATE_IDLE;
           end  // 2. Self-Collision Check via single-cycle lookups
           else if (snake_body[read_ptr] == {next_head_y, next_head_x}) begin
             game_over   <= 1'b1;
-            gen_food    <= 0;
-            grow_snake  <= 0;
-            update_body <= 0;
             state       <= STATE_IDLE;
           end else if (read_ptr < tail_ptr) begin
             read_ptr    <= read_ptr + 5'd1;
-            game_over   <= 1'b0;
-            gen_food    <= 1'b0;
-            grow_snake  <= 1'b0;
-            update_body <= 1'b0;
-            state       <= STATE_MOVE_HEAD;
+            state       <= STATE_MOVE_SNAKE;
           end else begin
-            game_over <= 1'b0;
-            gen_food <= 1'b0;
-            grow_snake <= 1'b0;
-            update_body <= 1'b0;
-            state <= STATE_MOVE_TAIL;
+            state <= STATE_GROW_SNAKE;
+            update_body <= 1'b1;
           end
         end
 
-        STATE_MOVE_TAIL: begin
+        STATE_GROW_SNAKE: begin
           if (eating_food) begin
-            game_over <= 1'b0;
             gen_food <= 1'b1;
             grow_snake <= 1'b1;
-            update_body <= 1'b1;
+            update_body <= 1'b0;
             state <= STATE_IDLE;
           end else begin
             // Clear the cell the tail is currently leaving
-            game_over <= 1'b0;
-            gen_food <= 1'b0;
-            grow_snake <= 1'b0;
-            update_body <= 1'b1;
+            update_body <= 1'b0;
             state <= STATE_IDLE;
           end
         end

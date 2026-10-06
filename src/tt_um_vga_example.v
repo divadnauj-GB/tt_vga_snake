@@ -20,7 +20,7 @@ module tt_um_vga_example (
   wire trigger;
   localparam CLK_FREQ = 25000000;
   localparam DEBOUNCE_FREQ = 100000;
-  localparam DEBOUNCE_TIME = CLK_FREQ / (8 * DEBOUNCE_FREQ);
+  localparam DEBOUNCE_TIME = CLK_FREQ / (10 * DEBOUNCE_FREQ);
 
 
   // VGA signals
@@ -35,7 +35,7 @@ module tt_um_vga_example (
   reg signed [$clog2(DEBOUNCE_TIME):0] debounce_counter;
   reg [1:0] user_dir;
   reg game_tick;
-  reg [3:0] frame_count;
+  reg [4:0] frame_count;
   wire frame_tick = (pix_x == 10'd0) && (pix_y == 10'd480);
   wire clean_key3;
   wire clean_key2;
@@ -149,7 +149,7 @@ module tt_um_vga_example (
         game_tick   <= 1'b0;
         frame_count <= frame_count + 1;
       end else begin
-        if (frame_count == 5'd15) begin
+        if (frame_count == 5'd20) begin
           game_tick   <= 1'b1;
           frame_count <= 0;
         end else begin
