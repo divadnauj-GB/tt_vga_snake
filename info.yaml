@@ -19,7 +19,7 @@ project:
   source_files:
     - "debounce.v"
     - "game_core.v"
-    - "hsync_generator.v"
+    - "hvsync_generator.v"
     - "tt_um_vga_example.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
