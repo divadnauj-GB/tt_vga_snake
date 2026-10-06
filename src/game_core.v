@@ -11,7 +11,7 @@ output  reg [1:0] R,G,B
 
 
 
-    localparam SNAKE_LENGHT = 32;
+    localparam SNAKE_LENGHT = 16;
     localparam ABS_UP    = 2'b00;
     localparam ABS_DOWN  = 2'b01;
     localparam ABS_LEFT  = 2'b10;
