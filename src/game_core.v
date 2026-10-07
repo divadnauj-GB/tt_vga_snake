@@ -230,8 +230,8 @@ and pushing a new head coordinates*/
   always @(*) begin
     is_body = 1'b0;
     for (j = 0; j < SNAKE_LENGHT; j = j + 1) begin
-      if (j < tail_ptr) begin
-        if (({cell_y, cell_x} == snake_body[j])) is_body = 1'b1;
+      if (({cell_y, cell_x} == snake_body[j])) begin
+        if (j < tail_ptr) is_body = 1'b1;
       end
     end
   end
