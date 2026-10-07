@@ -13,7 +13,7 @@ module game_core (
 
 
 
-  localparam SNAKE_LENGHT = 12;
+  localparam SNAKE_LENGHT = 10;
   localparam ABS_UP = 2'b00;
   localparam ABS_DOWN = 2'b01;
   localparam ABS_LEFT = 2'b10;
