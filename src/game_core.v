@@ -13,7 +13,7 @@ module game_core (
 
 
 
-  localparam SNAKE_LENGHT = 10;
+  localparam SNAKE_LENGHT = 9;
   localparam ABS_UP = 2'b00;
   localparam ABS_DOWN = 2'b01;
   localparam ABS_LEFT = 2'b10;
@@ -43,9 +43,10 @@ module game_core (
   reg game_over;
   reg update_body, grow_snake;
 
-  wire [4:0] next_head_x = (head_dir == ABS_LEFT)  ? head_x - 4'd1 : (head_dir == ABS_RIGHT) ? head_x + 4'd1 : head_x;
+  wire [4:0] next_head_x = (head_dir == ABS_LEFT)  ? head_x - 5'd1 : (head_dir == ABS_RIGHT) ? head_x + 5'd1 : head_x;
   wire [3:0] next_head_y = (head_dir == ABS_UP)    ? head_y - 4'd1 : (head_dir == ABS_DOWN)  ? head_y + 4'd1 : head_y;
   wire eating_food = (next_head_x == food_x) && (next_head_y == food_y);
+  wire touch_body = snake_body[read_ptr] == {next_head_y, next_head_x};
 
   reg is_body;
   wire is_food = (cell_x == food_x) && (cell_y == food_y);
@@ -82,7 +83,7 @@ and pushing a new head coordinates*/
     if (~rst_n) begin
       tail_ptr <= 1;
     end else begin
-      if (grow_snake && tail_ptr < (SNAKE_LENGHT - 1)) begin
+      if (grow_snake && tail_ptr != (SNAKE_LENGHT - 1)) begin
         tail_ptr <= tail_ptr + 1;
       end
     end
@@ -103,14 +104,6 @@ and pushing a new head coordinates*/
       case (state)
         STATE_IDLE: begin
           if ((game_tick && !game_over)) begin
-            // Enforce 180-degree blind-turn restriction safety locks
-            /*if ((user_dir == ABS_UP    && head_dir != ABS_DOWN)  ||
-                          (user_dir == ABS_DOWN  && head_dir != ABS_UP)    ||
-                          (user_dir == ABS_LEFT  && head_dir != ABS_RIGHT) ||
-                          (user_dir == ABS_RIGHT && head_dir != ABS_LEFT)) begin
-                          // Drop the computed relative crumb BEFORE changing the head's absolute direction
-                          head_dir <= user_dir;
-                      end*/
             head_dir <= user_dir;
             state    <= STATE_MOVE_SNAKE;
           end
@@ -129,7 +122,7 @@ and pushing a new head coordinates*/
             game_over <= 1'b1;
             state     <= STATE_IDLE;
           end  // 2. Self-Collision Check via single-cycle lookups
-          else if (snake_body[read_ptr] == {next_head_y, next_head_x}) begin
+          else if (touch_body) begin
             game_over <= 1'b1;
             state     <= STATE_IDLE;
           end else if (read_ptr < tail_ptr) begin
@@ -157,10 +150,6 @@ and pushing a new head coordinates*/
         /* TODO: add some states to check wheter the food was generated outside the snake body */
         /*TODO: Add some states for generating the Poison */
         default: begin
-          game_over <= 1'b0;
-          gen_food <= 1'b0;
-          grow_snake <= 1'b0;
-          update_body <= 1'b0;
           state <= STATE_IDLE;
         end
       endcase
@@ -180,8 +169,8 @@ and pushing a new head coordinates*/
   /*Food generation coordinates*/
   always @(posedge clk, negedge rst_n) begin
     if (~rst_n) begin
-      food_x <= 6;
-      food_y <= 8;
+      food_x <= 3;
+      food_y <= 7;
     end else begin
       if (gen_food) begin
         food_x <= rnd_counter[7:4];
